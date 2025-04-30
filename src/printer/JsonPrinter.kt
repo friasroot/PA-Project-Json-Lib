@@ -22,6 +22,7 @@ class JsonPrinter : Printer{
                     .replace("]", "\n]")
                     .replace(":", ": ")
                     .replace("{", "{\n")
+                    .replace("}", "\n}")
         )
     }
 
