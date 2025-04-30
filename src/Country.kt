@@ -1,6 +1,4 @@
 import constants.COUNTRY
-import constants.CURRENCY
-import constants.LANGUAGE
 
 data class Country (
     val country: COUNTRY?,
