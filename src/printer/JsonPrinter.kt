@@ -38,6 +38,9 @@ class JsonPrinter : Printer{
 
         newText = newText.plus(obj::class.simpleName + "[")
 
+        //TODO: Use a map instead of iterating all params to create string
+
+
         params?.forEachIndexed { index, v ->
             val prop = clazz.matchProperty(v)
             val value = prop.call(obj)
@@ -79,7 +82,7 @@ class JsonPrinter : Printer{
             values.forEachIndexed { index, value ->
                 text = text.plus(mapValue(value))
                 if (index != values.size - 1)
-                    text = text.plus(", ")
+                    text = text.plus(",")
             }
 
             return text.plus("}")
