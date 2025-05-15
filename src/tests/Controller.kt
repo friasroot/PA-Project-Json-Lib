@@ -1,4 +1,9 @@
-package getjson
+package tests
+
+import getjson.GetJson
+import getjson.Mapping
+import getjson.Param
+import getjson.Path
 
 @Mapping("api")
 class Controller {

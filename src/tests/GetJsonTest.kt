@@ -1,12 +1,16 @@
 package getjson
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.junit.Test
+import tests.main
+import java.net.URI
+import java.net.http.HttpClient
 import kotlin.test.assertEquals
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import kotlin.test.Test
+
 
 class GetJsonTest {
-    private val client = OkHttpClient()
+    private val client = HttpClient.newBuilder().build()
 
     companion object {
         init {
@@ -19,33 +23,36 @@ class GetJsonTest {
 
     @Test
     fun testIntsEndpoint() {
-        val request = Request.Builder().url("http://localhost:8080/api/ints").build()
-        client.newCall(request).execute().use { response ->
-            assertEquals("[1,2,3]", response.body?.string())
-        }
+        val request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/api/ints")).GET().build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        println("Status code: ${response.statusCode()}")
+        println("Response body: ${response.body()}")
+
+        assertEquals("[1,2,3]", response.body()?.toString())
     }
 
     @Test
     fun testPairEndpoint() {
-        val request = Request.Builder().url("http://localhost:8080/api/pair").build()
-        client.newCall(request).execute().use { response ->
-            assertEquals("{\"first\":\"um\",\"second\":\"dois\"}", response.body?.string())
-        }
+        val request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/api/pair")).GET().build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals("{\"first\":\"um\",\"second\":\"dois\"}", response.body()?.toString())
     }
 
     @Test
     fun testPathEndpoint() {
-        val request = Request.Builder().url("http://localhost:8080/api/path/teste").build()
-        client.newCall(request).execute().use { response ->
-            assertEquals("\"teste!\"", response.body?.string())
-        }
+        val request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/api/path/teste")).GET().build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals("\"teste!\"", response.body()?.toString())
     }
 
     @Test
     fun testArgsEndpoint() {
-        val request = Request.Builder().url("http://localhost:8080/api/args?n=3&text=PA").build()
-        client.newCall(request).execute().use { response ->
-            assertEquals("{\"PA\":\"PAPAPA\"}", response.body?.string())
-        }
+        val request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/api/args?n=3&text=PA")).GET().build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+
+        assertEquals("{\"PA\":\"PAPAPA\"}", response.body()?.toString())
     }
 }

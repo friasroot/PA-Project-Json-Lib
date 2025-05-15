@@ -2,12 +2,12 @@ package getjson
 
 import java.net.InetSocketAddress
 import com.sun.net.httpserver.HttpServer
+import json.JsonMapper
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.javaType
-import json.toJsonValue // Inferência da fase 2
 
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 annotation class Mapping(val path: String)
@@ -46,7 +46,7 @@ class GetJson(vararg controllers: KClass<*>) {
                 } ?: emptyMap()
 
                 val result = handler.call(pathParams, queryParams)
-                val json = result?.toJsonValue()?.toJsonString() ?: "null"
+                val json =  JsonMapper().toJsonValue(result).toString()
                 exchange.sendResponseHeaders(200, json.toByteArray().size.toLong())
                 exchange.responseBody.use { it.write(json.toByteArray()) }
             }

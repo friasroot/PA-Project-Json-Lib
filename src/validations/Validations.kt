@@ -29,8 +29,8 @@ class ArrayTypeCheckerVisitor : JsonVisitor {
     var allSameType = true
 
     override fun visitArray(array: JsonArray) {
-        val type = array.newArray.first()::class
-        for(item in array.newArray) {
+        val type = array.elements.first()::class
+        for(item in array.elements) {
             if (item::class != type) {
                 allSameType = false
                 break
