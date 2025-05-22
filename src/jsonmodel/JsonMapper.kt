@@ -1,9 +1,12 @@
-package json
+package jsonmodel
 
 import kotlin.reflect.KClass
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
+/**
+ * Mapper for the json values
+ */
 class JsonMapper {
     fun toJsonValue(value: Any?): JsonValue = when (value) {
         is JsonValue -> value
@@ -24,7 +27,7 @@ class JsonMapper {
             val kClass: KClass<out Any> = value::class
             val props = kClass.memberProperties.associate { prop ->
                 prop.isAccessible = true
-                prop.name to toJsonValue(prop.get(value as Nothing))
+                prop.name to toJsonValue(prop.call(value))
             }
             JsonObject(props.toMutableMap())
         }

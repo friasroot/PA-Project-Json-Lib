@@ -1,32 +1,41 @@
-package json
+package jsonmodel
 
-import visitor.JsonVisitor
+import jsonmodel.visitor.JsonVisitor
 
 sealed class JsonValue {
     abstract fun serialize() : String
     abstract fun accept(visitor: JsonVisitor)
 }
 
-data class JsonObject(val newJsonObject: MutableMap<String, JsonValue>) : JsonValue() {
+data class JsonObject(val entries: MutableMap<String, JsonValue>) : JsonValue() {
 
     fun replace(objName: String, newValue: JsonValue) {
 
-        if (!newJsonObject.containsKey(objName)) {
+        if (!entries.containsKey(objName)) {
             throw Exception("Entry does not exist, add it instead of replacing")
         }
 
-        newJsonObject[objName] = newValue
+        entries[objName] = newValue
+    }
+
+    fun add(newValue: Pair<String, JsonValue>) {
+
+        if (entries[newValue.first] != null){
+            throw Exception("Entry already exists")
+        }
+
+        entries[newValue.first] = newValue.second
     }
 
     override fun serialize(): String {
-        return newJsonObject.entries.joinToString(prefix = "{", postfix = "}") { (name, type) ->
+        return entries.entries.joinToString(prefix = "{", postfix = "}") { (name, type) ->
             "\"${name}\":${type.serialize()}"
         }
     }
 
     override fun accept(visitor: JsonVisitor) {
         visitor.visitObject(this)
-        newJsonObject.values.forEach{ it.accept(visitor) }
+        entries.values.forEach{ it.accept(visitor) }
     }
 }
 

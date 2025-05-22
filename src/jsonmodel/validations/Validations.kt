@@ -1,19 +1,27 @@
-package validations
+package jsonmodel.validations
 
-import json.JsonArray
-import json.JsonBoolean
-import json.JsonNull
-import json.JsonNumber
-import json.JsonObject
-import json.JsonString
-import visitor.JsonVisitor
+import jsonmodel.JsonArray
+import jsonmodel.JsonBoolean
+import jsonmodel.JsonNull
+import jsonmodel.JsonNumber
+import jsonmodel.JsonObject
+import jsonmodel.JsonString
+import jsonmodel.visitor.JsonVisitor
 
+/**
+ * A visitor validator
+ *
+ * This class uses visitors, to facilitate the development of new features
+ * that involve traversing the structure recursively.
+ *
+ * Extends JsonVisitor interface
+ */
 class ObjectValidatorVisitor : JsonVisitor {
     var valid = true
     private val objectKeys = mutableListOf<Set<String>>()
 
     override fun visitObject(obj: JsonObject) {
-        val keys = obj.newJsonObject.keys
+        val keys = obj.entries.keys
         if (keys.size != keys.toSet().size) valid = false
         objectKeys.add(keys)
     }
@@ -29,13 +37,8 @@ class ArrayTypeCheckerVisitor : JsonVisitor {
     var allSameType = true
 
     override fun visitArray(array: JsonArray) {
-        val type = array.elements.first()::class
-        for(item in array.elements) {
-            if (item::class != type) {
-                allSameType = false
-                break
-            }
-        }
+        val type = array.elements.filterNot { item -> item is JsonNull}.first()::class
+        allSameType = array.elements.all{ it::class ==  type}
     }
 
     override fun visitObject(obj: JsonObject) {}

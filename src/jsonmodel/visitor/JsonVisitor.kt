@@ -1,11 +1,11 @@
-package visitor
+package jsonmodel.visitor
 
-import json.JsonArray
-import json.JsonBoolean
-import json.JsonNull
-import json.JsonNumber
-import json.JsonObject
-import json.JsonString
+import jsonmodel.JsonArray
+import jsonmodel.JsonBoolean
+import jsonmodel.JsonNull
+import jsonmodel.JsonNumber
+import jsonmodel.JsonObject
+import jsonmodel.JsonString
 
 interface JsonVisitor {
     fun visitObject(obj: JsonObject)
