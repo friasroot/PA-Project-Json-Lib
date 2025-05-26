@@ -105,7 +105,6 @@ Returns a map from key=value strings.
 ```bash
 curl "http://localhost:8080/api/object?mapString=age=25&mapString=name=John&mapString=tags=one,two"
 ```
-
 Example response:
 ```json
 {
@@ -158,10 +157,9 @@ Returns a pair of strings.
 ```bash
 curl "http://localhost:8080/api/pair"
 ```
-
 Example response:
 ```json
-["um", "dois"]
+{"first":"um", "second":"dois"}
 ```
 
 ---
@@ -171,10 +169,9 @@ Pass a value as a path variable.
 ```bash
 curl "http://localhost:8080/api/path/example"
 ```
-
 Example response:
 ```text
-example!
+"example!"
 ```
 
 ---
@@ -184,7 +181,6 @@ Combines parameters into a map.
 ```bash
 curl "http://localhost:8080/api/args?n=3&text=hi"
 ```
-
 Example response:
 ```json
 {"hi": "hihihi"}
