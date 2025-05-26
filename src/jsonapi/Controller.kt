@@ -13,15 +13,20 @@ class Controller {
     fun array(@Param list: List<*>): List<*> = list
 
     @Mapping("object")
-    fun obj(@Param mapString: Map<String, Any>): Map<String, Any> {
-
-        //var mapping = this::class.memberFunctions.filter { it.findAnnotation<Mapping>()!!.path == pathVar }
-        //var result = mutableMapOf<String, Any>()
-
-        //result.putAll(mapString.split("=")
-        //    .map { it.split(",") }.associate { it.first() to it.last() })
-
-        return mapString //result.toMap()
+    fun obj(@Param mapString: List<*>): Map<String, Any> {
+        val outputMap = mutableMapOf<String, Any>()
+        mapString.map { elem ->
+            if (elem is String) {
+                val parts = elem.split("=", limit = 2)
+                val values = parts[1].split(",")
+                outputMap[parts[0]] = ( if (values.count() <= 1)
+                                            values.first().convert()
+                                        else
+                                            values.map { it.convert() }
+                                        ) as Any
+            }
+        }
+        return outputMap
     }
 
     @Mapping("null")
@@ -41,4 +46,16 @@ class Controller {
 
     @Mapping("args")
     fun args(@Param n: Int, @Param text: String): Map<String, String> = mapOf(text to text.repeat(n))
+}
+
+private fun String.convert(): Any? {
+    if (this == "null")
+        return null
+
+    return  this.toIntOrNull() ?:
+            this.toDoubleOrNull() ?:
+            this.toLongOrNull() ?:
+            this.toFloatOrNull() ?:
+            this.toBooleanStrictOrNull() ?:
+            this
 }

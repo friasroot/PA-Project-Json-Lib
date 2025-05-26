@@ -15,11 +15,13 @@ import okhttp3.Request
  */
 class JsonAPITest {
     private val client = OkHttpClient().newBuilder().build()
-    private val url = "http://localhost:8080/api"
+    private val port = 8080
+    private val url = "http://localhost:$port/api"
 
     init {
         Thread {
-            main()
+            val app = JsonAPI(Controller::class)
+            app.start(port)
         }.start()
         Thread.sleep(1000)
     }
@@ -125,13 +127,13 @@ class JsonAPITest {
      */
     @Test
     fun testObjectEndpoint() {
-        val fullUrl = "$url/object?ViagemA=\"1\",\"2\",true,null&t1=\"a\"&t2=1"
+        val fullUrl = "$url/object?mapString=ViagemA=a,2,true,null&mapString=t1=a&mapString=t2=1"
         val request = Request.Builder().url(fullUrl).build()
         val response = client.newCall(request).execute()
         val json = JsonObject(mutableMapOf(
             "ViagemA" to JsonArray(mutableListOf(
-                JsonString("1"),
-                JsonString("2"),
+                JsonString("a"),
+                JsonNumber(2),
                 JsonBoolean(true),
                 JsonNull()
             )),
@@ -211,9 +213,4 @@ class JsonAPITest {
 
         assertEquals(json.serialize(), response.body?.string())
     }
-}
-
-private fun main() {
-    val app = JsonAPI(Controller::class)
-    app.start(8080)
 }

@@ -4,10 +4,7 @@ import com.sun.net.httpserver.HttpServer
 import java.net.InetSocketAddress
 import jsonmodel.JsonMapper
 import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.KParameter
 import kotlin.reflect.full.*
-import kotlin.reflect.jvm.javaType
 
 @Target(AnnotationTarget.CLASS)
 annotation class RestController
@@ -37,9 +34,15 @@ class JsonAPI(vararg controllers: KClass<*>) {
             val instance = controllerClass.createInstance()
 
             controllerClass.memberFunctions.filter { it.findAnnotation<Mapping>() != null }.forEach { func ->
+                val pathVars = func.parameters.filter { it.hasAnnotation<Path>() }.map{ "\\{${it.name}\\}" }
                 val subPath = func.findAnnotation<Mapping>()!!.path
+                var publicSubPath = subPath
+                pathVars.forEach {
+                    publicSubPath = publicSubPath.replace("/$it".toRegex(), "")
+                }
+                val publicFullPath = normalize("/$basePath/$publicSubPath")
                 val fullPath = normalize("/$basePath/$subPath")
-                routes[fullPath] = RouteHandler(instance, func)
+                routes[publicFullPath] = RouteHandler(instance, func, fullPath)
             }
         }
     }
@@ -56,8 +59,8 @@ class JsonAPI(vararg controllers: KClass<*>) {
                     }
 
                     val uri = exchange.requestURI
-                    val pathParams = extractPathParams(path, uri.path)
-                    val queryParams = if(uri.rawQuery != null) parseQueryParams(uri.rawQuery) else emptyMap()
+                    val pathParams = extractPathParams(handler.privatePath, uri.path)
+                    val queryParams = parseQueryParams(uri.rawQuery)
 
                     val result = handler.call(pathParams, queryParams)
                     val json = JsonMapper().toJsonValue(result)
@@ -88,67 +91,19 @@ class JsonAPI(vararg controllers: KClass<*>) {
         return routeParts.zip(actualParts).filter { it.first.startsWith("{") && it.first.endsWith("}") }
             .associate { it.first.removeSurrounding("{", "}") to it.second }
     }
-}
 
-/**
- * Handles the routing for the api calls
- *
- * @param instance created for the route
- * @param func api function
- */
-class RouteHandler(private val instance: Any, private val func: KFunction<*>) {
-    fun call(pathParams: Map<String, String>, queryParams: Map<String, List<String>>): Any? {
-        val args = func.parameters.map { param ->
-            when {
-                param.kind == KParameter.Kind.INSTANCE -> instance
-                param.findAnnotation<Path>() != null -> pathParams[param.name]?.convert(param.type.javaType)
-                param.findAnnotation<Param>() != null -> {
-                    val paramValue = queryParams[param.name]
-                    if (paramValue is List && paramValue.count() > 1)
-                        paramValue?.map { it.convert() }
-                    else if (paramValue is List && paramValue.count() == 1)
-                        paramValue[0].convert(param.type.javaType)
-                    else
-                        return paramValue
-                }
-                else -> null
+    // Parses query parameters like ?list=1&list=2
+    private fun parseQueryParams(query: String?): Map<String, List<String>> {
+        if (query == null)
+            return emptyMap()
+
+        return query.split("&")
+            .map {
+                val parts = it.split("=", limit = 2)
+                parts[0] to parts[1]
             }
-        }
-        return func.call(*args.toTypedArray())
-    }
-
-    private fun String.convert(type: java.lang.reflect.Type): Any = when (type.typeName) {
-        "int", "java.lang.Integer", "kotlin.Int" -> this.toInt()
-        "double", "java.lang.Double", "kotlin.Double" -> this.toDouble()
-        "boolean", "java.lang.Boolean", "kotlin.Boolean" -> this.toBoolean()
-        else -> this
-    }
-
-    private fun String.convert(): Any? {
-        if (this == "null")
-            return null
-        if (this.toIntOrNull() != null)
-            return this.toInt()
-        else if (this.toDoubleOrNull() != null)
-            return this.toDouble()
-        else if (this.toLongOrNull() != null)
-            return this.toLong()
-        else if (this.toFloatOrNull() != null)
-            return this.toFloat()
-        else if (this.toBooleanStrictOrNull() != null)
-            return this.toBoolean()
-
-        return this
+            .groupBy({ it.first }, { it.second })
     }
 }
 
-// Parses query parameters like ?list=1&list=2
-private fun parseQueryParams(query: String): Map<String, List<String>> {
-    return query.split("&")
-        .map {
-            val parts = it.split("=", limit = 2)
-            parts[0] to parts[1]
-        }
-        .groupBy({ it.first }, { it.second })
-}
 
