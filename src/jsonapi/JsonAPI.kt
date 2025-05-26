@@ -42,6 +42,7 @@ class JsonAPI(vararg controllers: KClass<*>) {
                 }
                 val publicFullPath = normalize("/$basePath/$publicSubPath")
                 val fullPath = normalize("/$basePath/$subPath")
+                //Needs to have a public fullPath and a private fullPath to handle calls that include path parameters
                 routes[publicFullPath] = RouteHandler(instance, func, fullPath)
             }
         }
@@ -59,6 +60,7 @@ class JsonAPI(vararg controllers: KClass<*>) {
                     }
 
                     val uri = exchange.requestURI
+                    //Uses privatePath instead of the url path in the routes for calls with path params
                     val pathParams = extractPathParams(handler.privatePath, uri.path)
                     val queryParams = parseQueryParams(uri.rawQuery)
 
