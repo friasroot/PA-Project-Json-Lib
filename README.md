@@ -16,22 +16,30 @@ Authors: Henrique Niza (131898) e Rute Roque (128919)
 
 ## Project Structure
 ```
-src/
-  jsonmodel/
-    JsonLib.kt
-    JsonMapper
-  jsonapi/
-    Controller.kt
-    JsonAPI.kt
-    jsonmodel.tests/
-      JsonAPITest.kt
-  jsonmodel.tests/
-    JsonLibTest.kt
-  jsonmodel.validations/
-    Validations.kt
-  jsonmodel.visitor/
-    JsonVisitor.kt
-  Main.kt
+PA-Project-Json-Lib
+├── src/
+│   ├── jsonapi/
+│   │   ├── tests/
+│   │   │   ├── JsonAPITest.kt
+│   │   ├── Controller.kt
+│   │   ├── JsonAPI.kt
+│   │   ├── RouteHandler.kt
+│   ├── jsonmodel/
+│   │   ├── tests/
+│   │   │   ├── JsonLibTest.kt
+│   │   ├── validations/
+│   │   │   ├── Validations.kt
+│   │   ├── visitor/
+│   │   │   ├── JsonVisitor.kt
+│   │   ├── JsonLib.kt
+│   │   ├── JsonMapper.kt
+│   │   ├── JsonModel.puml
+│   │   ├── UML Diagram.txt
+│   ├── META-INF
+│   │   ├──  MANIFEST.MF
+│   ├── Main.kt
+├── PA-Project-Json-Lib.iml
+├── README.md
 ```
 
 ---
@@ -192,6 +200,7 @@ Example response:
 - `@Param` fields are passed as query parameters.
 - `@Path` fields are passed as URL path variables.
 
+---
 
 ## Limitations
 Supports only GET endpoints for now
@@ -200,11 +209,15 @@ No support for path/query parameters (yet)
 
 Only Kotlin-native types (Int, String, Boolean, List, Map, Enums, Data Classes, Null) are supported in JSON inference
 
+---
+
 ## License
 This project is educational and lightweight. Feel free to use, adapt, and extend it.
 
+---
+
 ## Acknowledgements
-This microframework was built from scratch as an academic alternative to Spring Boot, demonstrating:
+This microframework was built from scratch as an academic project, demonstrating:
 
 - Manual JSON modeling 
 - Kotlin reflection for type-safe inference 
