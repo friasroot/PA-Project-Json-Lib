@@ -1,0 +1,55 @@
+@startuml
+!pragma layout smetana
+
+class JsonValue {
+    +serialize(): String
+    +accept(visitor: JsonVisitor)
+}
+
+class JsonObject{
+    -entries: Map<String, JsonValue>
+    +replace(objName: String, newValue: JsonValue)
+    +add(newValue: Pair<String, JsonValue>)
+}
+
+class JsonArray {
+    -elements: List<JsonValue>
+}
+
+class JsonString {
+    -value: String
+}
+
+class JsonNumber {
+    -value: Number
+}
+
+class JsonBoolean {
+    -value: Boolean
+}
+
+class JsonNull {
+    {static} INSTANCE: JsonNull
+}
+
+interface JsonVisitor {
+    +visitObject(obj: JsonObject)
+    +visitArray(array: JsonArray)
+    +visitString(string: JsonString)
+    +visitNumber(number: JsonNumber)
+    +visitBoolean(boolean: JsonBoolean)
+    +visitNull(nullValue: JsonNull)
+}
+
+JsonValue <|.. JsonObject
+JsonValue <|.. JsonArray
+JsonValue <|.. JsonString
+JsonValue <|.. JsonNumber
+JsonValue <|.. JsonBoolean
+JsonValue <|.. JsonNull
+
+JsonObject ..> JsonValue : uses
+JsonArray ..> JsonValue : uses
+JsonValue ..> JsonVisitor : accept(visitor)
+
+@enduml

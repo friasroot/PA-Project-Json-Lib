@@ -1,0 +1,37 @@
+                        +-------------------------------+
+                        |   <<sealed class>>            |
+                        |   JsonValue                   |
+                        +-------------------------------+
+                        | +serialize(): String          |
+                        | +accept(jsonmodel.visitor: JsonVisitor) |
+                        +-------------------------------+
+                                      ^
+                                     /_\
+                                      |
+       ----------------------------------------------------------------------------
+       |               |             |             |              |               |
+       |               |             |             |              |               |
++-------------+ +-------------+ +------------+ +-----------+ +-----------+ +-------------+
+| JsonObject  | | JsonArray   | | JsonString | | JsonNumber| |JsonBoolean| | JsonNull    |
++-------------+ +-------------+ +------------+ +-----------+ +-----------+ +-------------+
+| - entries:  | | -elements:  | | -value:    | | -value:   | | -value:   | | (singleton) |
+| Map<String, | | List<       | | String     | | Number    | | Boolean.  | |             |
+|  JsonValue> | | JsonValue>  | |            | |           | |           | |             |
++-------------+ +-------------+ +------------+ +-----------+ +-----------+ +-------------+
+| +get(key)   | | +get(i)     |
+| +filter(...)| | +filter(...)|
+|             | | +map(...)   |
++-------------+ +-------------+
+
+
++---------------------+
+|   <<interface>>     |
+|   JsonVisitor       |
++---------------------+
+| +visitObject(obj)   |
+| +visitArray(array)  |
+| +visitString(str)   |
+| +visitNumber(num)   |
+| +visitBoolean(bool) |
+| +visitNull(null)    |
++---------------------+
