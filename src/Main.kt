@@ -6,6 +6,8 @@ import jsonmodel.validations.ObjectValidatorVisitor
 
 fun main() {
 
+    println("## PA Project Json Lib ##\n")
+
     println("\t\t----------\t\nSample:")
 
     //Creates a json object
@@ -31,7 +33,7 @@ fun main() {
 
     val typeChecker = ArrayTypeCheckerVisitor()
     json.accept(typeChecker)
-    println("\tArrays have only homogeneous json types: ${typeChecker.allSameType}")
+    println("\tArrays in sample object have only homogeneous json types: ${typeChecker.allSameType}")
     println("\t\t----------\t\n")
 
     // Starts server

@@ -25,7 +25,6 @@ class JsonLibTest {
         assertEquals(false, typeChecker.allSameType)
     }
 
-    //TODO: Comparar que o objecto final é o esperado em vez de comparar strings/valores
     @Test
     fun testFinalObject() {
         val jsonObject = JsonObject(mutableMapOf(
@@ -38,7 +37,6 @@ class JsonLibTest {
             "t2" to JsonNumber(1)
         ))
 
-        println(jsonObject)
         val startsWithJsonObject = jsonObject::class == JsonObject::class
         val containsJsonArray = jsonObject.entries.containsValue(JsonArray(mutableListOf(
             JsonString("1"),
@@ -50,5 +48,60 @@ class JsonLibTest {
 
         assertEquals(true,
             startsWithJsonObject && containsJsonArray && containsJsonString && containsJsonNumber)
+    }
+
+    @Test
+    fun testReplaceInObject() {
+        val jsonObject = JsonObject(mutableMapOf(
+            "ViagemA" to JsonArray(mutableListOf(
+                JsonString("1"),
+                JsonBoolean(true),
+                JsonNull()
+            )),
+            "t1" to JsonString("a"),
+            "t2" to JsonNumber(1)
+        ))
+
+        jsonObject.replace("t1", JsonString("b"))
+
+        val startsWithJsonObject = jsonObject::class == JsonObject::class
+        val containsJsonArray = jsonObject.entries.containsValue(JsonArray(mutableListOf(
+            JsonString("1"),
+            JsonBoolean(true),
+            JsonNull()
+        )))
+        val containsJsonString = jsonObject.entries.containsValue(JsonString("b"))
+        val containsJsonNumber = jsonObject.entries.containsValue(JsonNumber(1))
+
+        assertEquals(true,
+            startsWithJsonObject && containsJsonArray && containsJsonString && containsJsonNumber)
+    }
+
+    @Test
+    fun testAddToObject() {
+        val jsonObject = JsonObject(mutableMapOf(
+            "ViagemA" to JsonArray(mutableListOf(
+                JsonString("1"),
+                JsonBoolean(true),
+                JsonNull()
+            )),
+            "t1" to JsonString("a"),
+            "t2" to JsonNumber(1)
+        ))
+
+        jsonObject.add("new1" to JsonString("newA"))
+
+        val newJsonObject = JsonObject(mutableMapOf(
+            "ViagemA" to JsonArray(mutableListOf(
+                JsonString("1"),
+                JsonBoolean(true),
+                JsonNull()
+            )),
+            "t1" to JsonString("a"),
+            "t2" to JsonNumber(1),
+            "new1" to JsonString("newA")
+        ))
+
+        assertEquals(jsonObject, newJsonObject)
     }
 }
